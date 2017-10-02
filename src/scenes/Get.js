@@ -38,8 +38,10 @@ export default class Get extends Component {
                     time : Date.now()
                 }
                 this.setState({code:verificationCode},()=>console.log('SET STATE'));
-                let ref = `users/${API.getUid()}/verificationData`
-                API.writeData(ref,verficationData);
+
+                // This will execute on background service
+                // let ref = `users/${API.getUid()}/verificationData`
+                // API.writeData(ref,verificationData);
             }
             console.info(message)
         })
