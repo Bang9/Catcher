@@ -7,7 +7,7 @@ import firebase from '../commons/Firebase'
 const {width,height} = Dimensions.get('window');
 
 
-class DrawerContent extends React.Component {
+class MenuDrawer extends React.Component {
     static propTypes = {
         name: React.PropTypes.string,
         sceneStyle: ViewPropTypes.style,
@@ -33,16 +33,22 @@ class DrawerContent extends React.Component {
     }
 
     componentDidMount(){
-        firebase.auth().onAuthStateChanged( (user)=>{
-            if(user){
-                let ref = `users/${user.uid}/`
-                API.getDataOnce(ref + 'userConfig')
-                    .then(data => this.setState({userConfig: data.val()}))
-                API.getDataOnce(ref + 'authType')
-                    .then(data => this.setState({authType: data.val()}))
+        console.log('drawer did mounted')
+        this.unsubscribe = firebase.auth().onAuthStateChanged( (user)=>{
+                console.log('auth changed',user)
+                if(user){
+                    let ref = `users/${user.uid}/`
+                    API.getDataOnce(ref + 'userConfig')
+                        .then(data => this.setState({userConfig: data.val()}))
+                    API.getDataOnce(ref + 'authType')
+                        .then(data => this.setState({authType: data.val()}))
+                }
+            })
+    }
 
-            }
-        })
+    componentWillUnmount(){
+        console.log('drawer did unmounted')
+        this.unsubscribe();
     }
 
     render() {
@@ -157,4 +163,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default DrawerContent;
+export default MenuDrawer;
