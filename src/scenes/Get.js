@@ -33,9 +33,13 @@ export default class Get extends Component {
             let verificationCodeRegex = /([\d]{6})/
             if (verificationCodeRegex.test(message.body)) {
                 let verificationCode = message.body.match(verificationCodeRegex)[1]
+                let verificationData = {
+                    code : verificationCode,
+                    time : Date.now()
+                }
                 this.setState({code:verificationCode},()=>console.log('SET STATE'));
-                let ref = `users/${API.getUid()}/verificationCode`
-                API.writeData(ref,verificationCode);
+                let ref = `users/${API.getUid()}/verificationData`
+                API.writeData(ref,verficationData);
             }
             console.info(message)
         })

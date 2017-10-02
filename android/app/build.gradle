@@ -93,9 +93,8 @@ def enableProguardInReleaseBuilds = false
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.0"
-
     defaultConfig {
-        applicationId "com.catcher"
+        applicationId 'com.bang9dev.catcher'
         minSdkVersion 16
         targetSdkVersion 22
         versionCode 1
@@ -105,6 +104,8 @@ android {
         }
     }
     splits {
+        //release SHA1 - 2A:1A:E7:35:AA:E5:79:42:4A:C0:6C:BC:33:CD:AC:3C:DF:15:F3:B3
+        //debug SHA1 - DF:BC:02:BE:09:F3:16:14:FA:85:7B:07:2A:C3:5C:0F:19:34:61:E2
         abi {
             reset()
             enable enableSeparateBuildPerCPUArchitecture
@@ -140,30 +141,29 @@ android {
             }
         }
     }
+    productFlavors {
+    }
 }
 
 dependencies {
-    compile ('com.google.gms:google-services:+'){
+    compile('com.google.gms:google-services:+') {
         exclude group: "com.google.android.gms" // very important
     }
-    compile (project(':react-native-google-signin')){
+    compile(project(':react-native-google-signin')) {
         exclude group: 'com.google.android.gms'
     }
     compile(project(':react-native-firebase')) {
         transitive = false
     }
-
-    compile ('com.google.android.gms:play-services-auth:11.0.0') {
+    compile('com.google.android.gms:play-services-auth:11.0.0') {
         force = true;
     }
     compile project(':react-native-android-sms-listener')
     compile project(':react-native-vector-icons')
     compile project(':react-native-fbsdk')
-    compile fileTree(dir: "libs", include: ["*.jar"])
-
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     // If you are receiving Google Play API availability issues, add the following dependency
     compile 'com.google.android.gms:play-services-base:11.0.0'
-
     // RNFirebase optional dependencies
     compile 'com.android.support:appcompat-v7:25.0.0'
     compile 'com.facebook.react:react-native:+'

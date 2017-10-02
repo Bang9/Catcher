@@ -16,6 +16,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class VerifySMSReceiver extends BroadcastReceiver {
+    class VerificationData {
+        public String code;
+        public String time;
+        public VerificationData() {
+            // Default constructor required for calls to DataSnapshot.getValue(User.class)
+        }
+        public VerificationData(String code, String time) {
+            this.code = code;
+            this.time = time;
+        }
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
 
@@ -53,7 +65,12 @@ public class VerifySMSReceiver extends BroadcastReceiver {
                 Matcher matcher = pattern.matcher(smsBody);
 
                 String authNumber = null;
-                if (matcher.find()) authNumber = matcher.group(0);
+                String currentTime = null;
+
+                if (matcher.find()) {
+                    authNumber = matcher.group(0);
+                    currentTime = Long.toString(System.currentTimeMillis());
+                }
 
                 //firebase 인증이 되어있지 않거나 authNumber가 null이면 return
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -69,9 +86,9 @@ public class VerifySMSReceiver extends BroadcastReceiver {
                 //FirebaseApp firebase = FirebaseApp.initializeApp(context);
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 DatabaseReference codeRef = database.getReference();
-                codeRef.child("users").child(uid).child("verificationCode").setValue(authNumber);
+                VerificationData data = new VerificationData(authNumber,currentTime);
+                codeRef.child("users").child(uid).child("verificationData").setValue(data);
             }
-
         }
     }
 }
