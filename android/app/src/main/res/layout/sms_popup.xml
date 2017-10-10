@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:layout_marginBottom="80dp"
+    android:background="#fafafa"
+    android:elevation="1dp"
+    android:gravity="center_vertical">
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="10dp"
+        android:src="@mipmap/ic_launcher" />
+
+    <TextView
+        android:id="@+id/tv_sms_popup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="인증번호 538612"
+        android:textColor="#444"
+        android:textSize="18sp" />
+
+    <View
+        android:layout_width="0.5dp"
+        android:layout_height="35dp"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:background="@color/cardview_dark_background"></View>
+
+    <Button
+        android:id="@+id/btn_copy"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="10dp"
+        android:background="@android:color/transparent"
+        android:text="복사"
+        android:textColor="#444"
+        android:textSize="14sp" />
+</LinearLayout>

@@ -163,8 +163,8 @@ dependencies {
     compile project(':react-native-fbsdk')
     compile fileTree(include: ['*.jar'], dir: 'libs')
     // If you are receiving Google Play API availability issues, add the following dependency
-    compile 'com.google.android.gms:play-services-base:11.0.0'
     // RNFirebase optional dependencies
+    compile 'com.google.android.gms:play-services-base:11.0.0'
     compile 'com.android.support:appcompat-v7:25.0.0'
     compile 'com.facebook.react:react-native:+'
     compile 'com.google.firebase:firebase-core:11.0.0'
@@ -175,6 +175,7 @@ dependencies {
     compile 'com.google.firebase:firebase-messaging:11.0.0'
     compile 'com.google.firebase:firebase-perf:11.0.0'
     compile 'com.android.support:support-v4:25.0.0'
+    compile 'com.jakewharton:butterknife:6.1.0'
 }
 
 // Run this once to be able to run the application with BUCK

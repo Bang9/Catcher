@@ -1,7 +1,6 @@
 package com.catcher;
 
 import android.app.Application;
-import android.content.Intent;
 
 import com.centaurwarchief.smslistener.SmsListenerPackage;
 import com.facebook.CallbackManager;
@@ -74,7 +73,6 @@ public class MainApplication extends Application implements ReactApplication {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
     FacebookSdk.sdkInitialize(getApplicationContext());
-
-    startService(new Intent(this, VerifySMSRegister.class));
+    //startService(new Intent(this, VerifySMSRegister.class));
   }
 }

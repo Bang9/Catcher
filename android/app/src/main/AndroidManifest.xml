@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.catcher"
     android:versionCode="1"
     android:versionName="1.0">
@@ -44,11 +45,24 @@
             android:enabled="true"
             android:exported="true" />
 
-        <receiver android:name=".VerifySMSReceiver">
+        <service android:name=".VerifyPopupService" />
+
+        <activity
+            android:name=".PopupActivity"
+            android:finishOnTaskLaunch="true"
+            android:launchMode="singleTask"
+            android:theme="@android:style/Theme.Translucent" >
+        </activity>
+
+        <receiver android:name=".VerifySMSReceiver"
+            android:enabled="true"
+            android:exported="true"
+            tools:ignore="ExportedReceiver" >
             <intent-filter>
-                <action android:name = "android.provider.Telephony.SMS_RECEIVED"/>
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>
+
     </application>
 
 </manifest>
