@@ -78,25 +78,17 @@ public class VerifySMSReceiver extends BroadcastReceiver {
 
                 String uid = user.getUid();
 
-                Log.d("FIREBASE UID",uid);
-
-                //SHOW TOAST
-//                Toast.makeText(context,"인증번호 : "+authNumber,Toast.LENGTH_LONG).show();
+                //Deprecated --- SHOW TOAST
+                //Toast.makeText(context,"인증번호 : "+authNumber,Toast.LENGTH_LONG).show();
 
                 //Start Popup Service
-                Log.d("RECEIVER","START SERVICE");
-//                Intent serviceIntent = new Intent(context, PopupActivity.class);
-//                serviceIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                serviceIntent.putExtra(PopupActivity.AUTH_NUMBER, authNumber);
-//                context.startActivity(serviceIntent);
-
-                Intent serviceIntent = new Intent(context, VerifyPopupService.class);
-                serviceIntent.putExtra(VerifyPopupService.AUTH_NUMBER, authNumber);
+                Log.d("SMS RECEIVER","START RECEIVE");
+                Intent serviceIntent = new Intent(context, VerifySMSPopupService.class);
+                serviceIntent.putExtra(VerifySMSPopupService.AUTH_NUMBER, authNumber);
                 context.startService(serviceIntent);
 
 
                 //데이터베이스에 등록
-                //FirebaseApp firebase = FirebaseApp.initializeApp(context);
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 DatabaseReference codeRef = database.getReference();
                 VerificationData data = new VerificationData(authNumber,currentTime);
