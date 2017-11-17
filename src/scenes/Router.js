@@ -39,6 +39,7 @@ class App extends Component {
         this.state={
             onLoading : true,
             authState : false,
+            backPressedTime:0
         }
     }
 
@@ -132,8 +133,13 @@ class App extends Component {
     onBackHandler() {
         console.log('BackHandler:this.sceneKey:' + Actions.currentScene);
         if (Actions.currentScene === "_get" || Actions.currentScene === "_login") {
-            BackHandler.exitApp();
-            return true; //remain in app
+            if(Date.now() > this.state.backPressedTime+2000) {
+                this.setState({backPressedTime: Date.now()})
+                ToastAndroid.show('뒤로 버튼을 한번 더 누르면 종료됩니다.', ToastAndroid.SHORT);
+                return true; //remain in app
+            }else{
+                return BackHandler.exitApp()
+            }
         } else {
             try {
                 Actions.pop();
@@ -145,7 +151,7 @@ class App extends Component {
         }
     }
 
-    reducerCreate(params) {
+    reducerCreate(params){
         const defaultReducer = Reducer(params);
         console.log("PARAM:",params);
         return (state, action) => {
