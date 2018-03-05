@@ -55,7 +55,7 @@ public class VerifySMSPopupService extends Service {
 
         // Get popup view and views component
         LayoutInflater layoutInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-        popupView = layoutInflater.inflate(R.layout.sms_popup, null);
+        popupView = layoutInflater.inflate(R.layout.sms_popup,null);
         tv_sms_popup = (TextView) popupView.findViewById(R.id.tv_sms_popup);
         btn_copy = (Button) popupView.findViewById(R.id.btn_copy);
     }
@@ -68,6 +68,11 @@ public class VerifySMSPopupService extends Service {
         if (!TextUtils.isEmpty(auth_number)) {
             tv_sms_popup.setText("인증번호 "+auth_number);
             setTouchListener(btn_copy);
+        }
+
+        //If popupView has already shown will be remove
+        if( popupView.isShown() ){
+            windowManager.removeViewImmediate(popupView);
         }
 
         // Add view
@@ -131,7 +136,8 @@ public class VerifySMSPopupService extends Service {
     }
 
     public void removePopup() {
-        if (popupView != null && windowManager != null) windowManager.removeView(popupView);
+        if(popupView != null && windowManager != null)
+            windowManager.removeView(popupView);
     }
 
     @Override

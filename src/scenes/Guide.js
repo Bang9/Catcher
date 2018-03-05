@@ -63,7 +63,7 @@ export default class Get extends Component {
                         />
                         <Slide
                             source={require('../images/guide_3.png')}
-                            text={"스마트폰에서는 토스트 메시지로\n스마트폰이 멀리있어도\n웹으로 인증번호를 빠르고 쉽게 제공합니다"}
+                            text={"스마트폰에서는 팝업 메시지로\n스마트폰이 멀리있어도\n웹으로 인증번호를 빠르고 쉽게 제공합니다"}
                             button={true}
                         />
                     </Swiper>

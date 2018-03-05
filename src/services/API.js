@@ -2,6 +2,8 @@ import { AsyncStorage ,Alert,ToastAndroid } from 'react-native'
 import firebase from '../commons/Firebase'
 import FBSDK from 'react-native-fbsdk';
 import {GoogleSignin} from 'react-native-google-signin';
+
+const GOOGLE_AUTH_CLIENT_ID = "216812482275-ipa1m8r6g1sjvo8tdvgh7uc0nvmfmslj.apps.googleusercontent.com";
 const {
     AccessToken,
     LoginManager,
@@ -64,9 +66,11 @@ class API {
     }
 
     setUserData(currentUser,authType){
+        console.log('SET USER DATA START::',currentUser)
         let userConfig = null;
 
         if(authType === 'facebook') {
+            console.log('SET USER DATA FACEBOOK')
             result = currentUser.providerData[0]
             userConfig = {
                 name: result.displayName || 'none',
@@ -84,6 +88,7 @@ class API {
                 uid: result.uid
             };
         }
+        console.log('set user data result',userConfig)
 
         AsyncStorage.setItem('@Session:authType', authType);
         AsyncStorage.setItem('@Session:userConfig', JSON.stringify(userConfig));
@@ -99,7 +104,7 @@ class API {
             .then( (res)=>{
                 console.log('GOOGLE HAS PLAY SERVICES',res)
                 return GoogleSignin.configure({
-                    webClientId:'216812482275-ipa1m8r6g1sjvo8tdvgh7uc0nvmfmslj.apps.googleusercontent.com',
+                    webClientId:GOOGLE_AUTH_CLIENT_ID,
                     offlineAccess:false
                 })
             })
@@ -167,12 +172,14 @@ class API {
                 // create a new firebase credential with the token
                 const credential = firebase.auth.FacebookAuthProvider.credential(data.accessToken);
                 // login with credential
+                console.log("FBAUTH CREDENTIAL::",credential)
                 return firebase.auth().signInWithCredential(credential);
             })
             .then((currentUser) => {
                 if (currentUser === 'cancelled') {
                     console.log('Login cancelled');
                 } else {
+                    console.log("FBAUTH SIGNED IN, Current User::",currentUser)
                     // now signed in
                     callback(false);
                     return this.setUserData(currentUser,'facebook')

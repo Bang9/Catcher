@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {Alert, BackHandler, Image, Platform, StatusBar, StyleSheet,
-    TouchableOpacity, AsyncStorage ,View, Text, AppState,} from "react-native";
+    TouchableOpacity, AsyncStorage ,View, Text, AppState, ToastAndroid} from "react-native";
 
 //modules
 import {Actions, Reducer, Router, Scene, Drawer} from "react-native-router-flux";
@@ -20,27 +20,14 @@ import MenuIcon from '../images/menu.png';
 //global states
 global.appState = AppState.currentState
 
-/*
- Scene props = {
- tabBarStyle: ViewPropTypes.style,
- tabBarSelectedItemStyle: ViewPropTypes.style,
- tabBarIconContainerStyle: ViewPropTypes.style,
- tabBarShadowStyle: ViewPropTypes.style,
- tabSceneStyle: ViewPropTypes.style,
- tabStyle: ViewPropTypes.style,
- tabTitleStyle: Text.propTypes.style,
- tabSelectedTitleStyle: Text.propTypes.style,
- tabTitle: PropTypes.string,
- };
- */
 class App extends Component {
     constructor(props){
         super(props)
         this.state={
             onLoading : true,
             authState : false,
-            backPressedTime:0
         }
+        this.backPressedTime=0
     }
 
     componentWillMount(){
@@ -133,8 +120,8 @@ class App extends Component {
     onBackHandler() {
         console.log('BackHandler:this.sceneKey:' + Actions.currentScene);
         if (Actions.currentScene === "_get" || Actions.currentScene === "_login") {
-            if(Date.now() > this.state.backPressedTime+2000) {
-                this.setState({backPressedTime: Date.now()})
+            if(Date.now() > this.backPressedTime+2000) {
+                this.backPressedTime = Date.now()
                 ToastAndroid.show('뒤로 버튼을 한번 더 누르면 종료됩니다.', ToastAndroid.SHORT);
                 return true; //remain in app
             }else{

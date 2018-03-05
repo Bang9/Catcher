@@ -29,6 +29,16 @@ public class VerifySMSReceiver extends BroadcastReceiver {
         }
     }
 
+    	public static String getAuthNumber(String SMS){
+    		System.out.println("FIND VERIFICATION WORDS");
+    		Pattern pattern = Pattern.compile("\\d{4,8}");
+    		Matcher matcher = pattern.matcher(SMS);
+    		if(matcher.find()){
+    			return matcher.group(0);
+    		}
+    		return null;
+    	}
+
     @Override
     public void onReceive(Context context, Intent intent) {
 
@@ -59,18 +69,25 @@ public class VerifySMSReceiver extends BroadcastReceiver {
                     sms.append(smsMessage.getMessageBody());
                 }
 
-                String smsBody = sms.toString();
+                String smsBody = sms.toString().toLowerCase();
 
-                Pattern pattern = Pattern.compile("\\d{6}");
-                Matcher matcher = pattern.matcher(smsBody);
-
+                //TODO pattern 이전에 verification 혹은 인증 이라는 문자 검사하고 문자열 4-6자리를 code로 반환
                 String authNumber = null;
                 String currentTime = null;
 
-                if (matcher.find()) {
-                    authNumber = matcher.group(0);
-                    currentTime = Long.toString(System.currentTimeMillis());
-                }
+                // smsBody에 대해서 인증문자인지 pattern 검사를 진행한다.
+                Pattern patternKor = Pattern.compile("인증");
+                Pattern patternEng = Pattern.compile("verification");
+                Matcher matcherKor = patternKor.matcher(smsBody);
+                Matcher matcherEng = patternEng.matcher(smsBody);
+
+                //만약 인증문자라는게 확인되면 getAuthNumber 메소드를 통해서 인증번호를 가져온다.
+         		if(matcherEng.find()){
+         			authNumber = getAuthNumber(smsBody);
+         		}else if(matcherKor.find()){
+         			authNumber = getAuthNumber(smsBody);
+         		}
+                currentTime = Long.toString(System.currentTimeMillis());
 
                 //firebase 인증이 되어있지 않거나 authNumber가 null이면 return
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -82,6 +99,8 @@ public class VerifySMSReceiver extends BroadcastReceiver {
                 //Toast.makeText(context,"인증번호 : "+authNumber,Toast.LENGTH_LONG).show();
 
                 //Start Popup Service
+                //TODO 팝업서비스 진행 전에 windowManager에 등록된 LinearLayout을 제거하거나 copy해서 start해야됨.
+                //--DONE--
                 Log.d("SMS RECEIVER","START RECEIVE");
                 Intent serviceIntent = new Intent(context, VerifySMSPopupService.class);
                 serviceIntent.putExtra(VerifySMSPopupService.AUTH_NUMBER, authNumber);
@@ -91,10 +110,12 @@ public class VerifySMSReceiver extends BroadcastReceiver {
                 //데이터베이스에 등록
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 DatabaseReference codeRef = database.getReference();
-                VerificationData data = new VerificationData(authNumber,currentTime);
+                VerificationData verifyData = new VerificationData(authNumber,currentTime);
                 Log.d("CODE REFERENCE", codeRef.child("users").child(uid).child("verificationData").toString());
-                codeRef.child("users").child(uid).child("verificationData").setValue(new VerificationData(authNumber,currentTime));
 
+                String key = codeRef.child("uid").child("verificationData").push().getKey();
+                codeRef.child("users").child(uid).child("verificationData").child(key).setValue(verifyData);
+                //codeRef.child("users").child("uid").child("verificationData").push(verifyData);
             }
         }
     }

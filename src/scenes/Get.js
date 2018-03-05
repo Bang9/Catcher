@@ -13,43 +13,36 @@ import {
     Image,
     Animated,
     Easing,
-    StatusBar
+    StatusBar,
+    ScrollView,
+    Dimensions
 } from 'react-native';
-import SmsListener from 'react-native-android-sms-listener';
+import firebase from '../commons/Firebase';
 import API from '../services/API';
+import SmsListener from 'react-native-android-sms-listener';
+import moment from 'moment';
+import ko from 'moment/locale/ko';
 
+moment.locale('ko');
+
+const {width,height} = Dimensions.get('window');
 export default class Get extends Component {
     constructor(){
         super();
         this.state={
-            code:null,
+            verifyList:[],
         }
         this.spinValue = new Animated.Value(0);
     }
     componentDidMount(){
         console.log('DID MOUNT');
-        SmsListener.addListener(message => {
-            console.log('GET MESSAGE');
-            let verificationCodeRegex = /([\d]{6})/
-            if (verificationCodeRegex.test(message.body)) {
-                let verificationCode = message.body.match(verificationCodeRegex)[1]
-                let verificationData = {
-                    code : verificationCode,
-                    time : Date.now()
-                }
-                this.setState({code:verificationCode},()=>console.log('SET STATE'));
-
-                // This will execute on background service
-                // let ref = `users/${API.getUid()}/verificationData`
-                // API.writeData(ref,verificationData);
-            }
-            console.info(message)
-        })
-
+        this.onHistory();
         this.spin();
     }
+    componentWillUnmount(){
+        API.getDataOff()
+    }
     spin () {
-        if(this.state.code!=null) return;
         this.spinValue.setValue(0);
         Animated.timing(
             this.spinValue,
@@ -61,21 +54,47 @@ export default class Get extends Component {
         ).start(() => this.spin())
     }
 
+    onHistory(){
+        const uid = API.getUid();
+        const historyRef = `users/${uid}/verificationData`;
+
+        firebase.database().ref(historyRef).orderByChild('/time').limitToLast(20).on('value',(snapshot)=>{
+            const result = snapshot.val();
+            if(result){
+                let verifyList = [];
+                const keys = Object.keys(result);
+                keys.sort().reverse().some( (key)=>{
+                    result[key].time = moment(parseInt(result[key].time));
+                    verifyList.push(result[key])
+                } );
+                this.setState({verifyList})
+            }
+        })
+        /*        API.getDataOn(historyRef, (snapshot)=>{
+         const result = snapshot.val();
+         if(result){
+         const keys = Object.keys(result);
+         let verifyList = [];
+         keys.some( (key)=>{ verifyList.push(result[key])} );
+         console.log(verifyList)
+         this.setState({verifyList})
+         }
+         })*/
+
+    }
+
     render() {
         const spin = this.spinValue.interpolate({
             inputRange: [0, 1],
             outputRange: ['0deg', '360deg']
         })
+
+        const {verifyList} = this.state;
         return (
             <View style={styles.container}>
                 {
-                    this.state.code ?
-                        <View style={{alignItems:'center'}}>
-                            <Text style={{fontSize: 20}}>인증번호</Text>
-                            <Text style={{fontSize:40, color:'#a339c5'}}>{this.state.code}</Text>
-                        </View>
-                        :
-                        <View style={{alignItems:'center'}}>
+                    <View style={{alignItems:'center'}}>
+                        <View style={{marginVertical:10}}>
                             <Animated.Image
                                 resizeMode={Image.resizeMode.contain}
                                 style={{
@@ -85,8 +104,32 @@ export default class Get extends Component {
                                 }}
                                 source={require('../images/Catcher.png')}
                             />
-                        <Text>대기중</Text>
+                            <Text>인증 히스토리</Text>
                         </View>
+                        <ScrollView style={{flex:1}}>
+                            {
+                                verifyList!=null &&
+                                verifyList.map((item,i)=>{
+                                    const {code,time} = item;
+                                    return (
+                                        <View key={i} style={{flexDirection:'row', marginVertical:3,paddingHorizontal:10, width:width, height:50, justifyContent:'center',alignItems:'center', backgroundColor:'#f7f7f7'}}>
+                                            <View style={{alignItems:'flex-start',position:'absolute',left:15}}>
+                                                <Text style={{fontSize:11,lineHeight:14,color:'#9c9c9c'}}>{time.format('YYYY/MM/DD')}</Text>
+                                                <Text style={{fontSize:14,lineHeight:14,color:'#5e5e5e'}}>{time.format('hh:mm')}</Text>
+                                            </View>
+                                            <View style={{flex:1,alignItems:'center'}}>
+                                                <Text style={{fontSize:10,lineHeight:12,color:'#9c9c9c'}}>인증번호</Text>
+                                                <Text style={{fontSize:18,lineHeight:19,color:'#7318c6'}}>{code}</Text>
+                                            </View>
+                                            <View style={{alignItems:'flex-end',position:'absolute',right:15}}>
+                                                <Text style={{fontSize:11,color:'#9c9c9c'}}>{time.fromNow()}</Text>
+                                            </View>
+                                        </View>
+                                    )
+                                })
+                            }
+                        </ScrollView>
+                    </View>
                 }
 
                 <StatusBar
