@@ -20,12 +20,14 @@ public class VerifySMSReceiver extends BroadcastReceiver {
     static class VerificationData {
         public String code;
         public String time;
+        public String sms;
         public VerificationData() {
             // Default constructor required for calls to DataSnapshot.getValue(User.class)
         }
-        public VerificationData(String code, String time) {
+        public VerificationData(String code, String time, String sms) {
             this.code = code;
             this.time = time;
+            this.sms  = sms;
         }
     }
 
@@ -74,6 +76,7 @@ public class VerifySMSReceiver extends BroadcastReceiver {
                 //TODO pattern 이전에 verification 혹은 인증 이라는 문자 검사하고 문자열 4-6자리를 code로 반환
                 String authNumber = null;
                 String currentTime = null;
+                String smsFull = smsBody;
 
                 // smsBody에 대해서 인증문자인지 pattern 검사를 진행한다.
                 Pattern patternKor = Pattern.compile("인증");
@@ -99,22 +102,28 @@ public class VerifySMSReceiver extends BroadcastReceiver {
                 //Toast.makeText(context,"인증번호 : "+authNumber,Toast.LENGTH_LONG).show();
 
                 //Start Popup Service
-                //TODO 팝업서비스 진행 전에 windowManager에 등록된 LinearLayout을 제거하거나 copy해서 start해야됨.
-                //--DONE--
                 Log.d("SMS RECEIVER","START RECEIVE");
                 Intent serviceIntent = new Intent(context, VerifySMSPopupService.class);
                 serviceIntent.putExtra(VerifySMSPopupService.AUTH_NUMBER, authNumber);
                 context.startService(serviceIntent);
 
+                //Start Push Service
+                try {
+                    FcmPushService pushService = new FcmPushService();
+                    pushService.setPushInfo(uid,authNumber);
+                    pushService.startPushService();
+                }catch(Exception e){
+                    Log.w("PUSH SERVICE ERROR :: ",e.getMessage());
+                }
 
-                //데이터베이스에 등록
+                //Regist VerificationData to Database
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
-                DatabaseReference codeRef = database.getReference();
-                VerificationData verifyData = new VerificationData(authNumber,currentTime);
-                Log.d("CODE REFERENCE", codeRef.child("users").child(uid).child("verificationData").toString());
+                DatabaseReference userRef = database.getReference().child("users").child(uid);
+                VerificationData verifyData = new VerificationData(authNumber,currentTime,smsFull);
+                Log.d("CODE REFERENCE", userRef.child("verificationData").toString());
 
-                String key = codeRef.child("uid").child("verificationData").push().getKey();
-                codeRef.child("users").child(uid).child("verificationData").child(key).setValue(verifyData);
+                String key = userRef.child("verificationData").push().getKey();
+                userRef.child("verificationData").child(key).setValue(verifyData);
                 //codeRef.child("users").child("uid").child("verificationData").push(verifyData);
             }
         }
