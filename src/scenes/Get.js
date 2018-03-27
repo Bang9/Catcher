@@ -19,30 +19,32 @@ import {
 } from 'react-native';
 import firebase from '../commons/Firebase';
 import API from '../services/API';
-import SmsListener from 'react-native-android-sms-listener';
 import moment from 'moment';
 import ko from 'moment/locale/ko';
 
 moment.locale('ko');
 
-const {width,height} = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 export default class Get extends Component {
-    constructor(){
+    constructor() {
         super();
-        this.state={
-            verifyList:[],
+        this.state     = {
+            verifyList: [],
         }
         this.spinValue = new Animated.Value(0);
     }
-    componentDidMount(){
+
+    componentDidMount() {
         console.log('DID MOUNT');
         this.onHistory();
         this.spin();
     }
-    componentWillUnmount(){
+
+    componentWillUnmount() {
         API.getDataOff()
     }
-    spin () {
+
+    spin() {
         this.spinValue.setValue(0);
         Animated.timing(
             this.spinValue,
@@ -54,19 +56,19 @@ export default class Get extends Component {
         ).start(() => this.spin())
     }
 
-    onHistory(){
-        const uid = API.getUid();
+    onHistory() {
+        const uid        = API.getUid();
         const historyRef = `users/${uid}/verificationData`;
 
-        firebase.database().ref(historyRef).orderByChild('/time').limitToLast(20).on('value',(snapshot)=>{
+        firebase.database().ref(historyRef).orderByChild('/time').limitToLast(20).on('value', (snapshot) => {
             const result = snapshot.val();
-            if(result){
+            if (result) {
                 let verifyList = [];
-                const keys = Object.keys(result);
-                keys.sort().reverse().some( (key)=>{
+                const keys     = Object.keys(result);
+                keys.sort().reverse().some((key) => {
                     result[key].time = moment(parseInt(result[key].time));
                     verifyList.push(result[key])
-                } );
+                });
                 this.setState({verifyList})
             }
         })
@@ -93,36 +95,49 @@ export default class Get extends Component {
         return (
             <View style={styles.container}>
                 {
-                    <View style={{alignItems:'center'}}>
-                        <View style={{marginVertical:10}}>
+                    <View style={{alignItems: 'center'}}>
+                        <View style={{marginVertical: 10}}>
                             <Animated.Image
                                 resizeMode={Image.resizeMode.contain}
                                 style={{
                                     transform: [{rotate: spin}],
-                                    width:60,height:60,
-                                    alignSelf:'center'
+                                    width: 60, height: 60,
+                                    alignSelf: 'center'
                                 }}
                                 source={require('../images/Catcher.png')}
                             />
                             <Text>인증 히스토리</Text>
                         </View>
-                        <ScrollView style={{flex:1}}>
+                        <ScrollView style={{flex: 1}}>
                             {
-                                verifyList!=null &&
-                                verifyList.map((item,i)=>{
-                                    const {code,time} = item;
+                                verifyList != null &&
+                                verifyList.map((item, i) => {
+                                    const {code, time} = item;
                                     return (
-                                        <View key={i} style={{flexDirection:'row', marginVertical:3,paddingHorizontal:10, width:width, height:50, justifyContent:'center',alignItems:'center', backgroundColor:'#f7f7f7'}}>
-                                            <View style={{alignItems:'flex-start',position:'absolute',left:15}}>
-                                                <Text style={{fontSize:11,lineHeight:14,color:'#9c9c9c'}}>{time.format('YYYY/MM/DD')}</Text>
-                                                <Text style={{fontSize:14,lineHeight:14,color:'#5e5e5e'}}>{time.format('hh:mm')}</Text>
+                                        <View key={i} style={styles.historyContainer}>
+                                            <View style={{alignItems: 'flex-start', position: 'absolute', left: 15}}>
+                                                <Text style={{
+                                                    fontSize: 11,
+                                                    lineHeight: 14,
+                                                    color: '#9c9c9c'
+                                                }}>{time.format('YYYY/MM/DD')}</Text>
+                                                <Text style={{
+                                                    fontSize: 14,
+                                                    lineHeight: 14,
+                                                    color: '#5e5e5e'
+                                                }}>{time.format('HH:mm')}</Text>
                                             </View>
-                                            <View style={{flex:1,alignItems:'center'}}>
-                                                <Text style={{fontSize:10,lineHeight:12,color:'#9c9c9c'}}>인증번호</Text>
-                                                <Text style={{fontSize:18,lineHeight:19,color:'#7318c6'}}>{code}</Text>
+                                            <View style={{flex: 1, alignItems: 'center'}}>
+                                                <Text
+                                                    style={{fontSize: 10, lineHeight: 12, color: '#9c9c9c'}}>인증번호</Text>
+                                                <Text style={{
+                                                    fontSize: 18,
+                                                    lineHeight: 19,
+                                                    color: '#7318c6'
+                                                }}>{code}</Text>
                                             </View>
-                                            <View style={{alignItems:'flex-end',position:'absolute',right:15}}>
-                                                <Text style={{fontSize:11,color:'#9c9c9c'}}>{time.fromNow()}</Text>
+                                            <View style={{alignItems: 'flex-end', position: 'absolute', right: 15}}>
+                                                <Text style={{fontSize: 11, color: '#9c9c9c'}}>{time.fromNow()}</Text>
                                             </View>
                                         </View>
                                     )
@@ -159,5 +174,15 @@ const styles = StyleSheet.create({
         color: '#333333',
         marginBottom: 5,
     },
+    historyContainer: {
+        flexDirection: 'row',
+        marginVertical: 3,
+        paddingHorizontal: 10,
+        width: width,
+        height: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#f7f7f7'
+    }
 });
 
