@@ -66,7 +66,7 @@ class Login extends Component {
         if(isCancel)
             return this.setState({showSpinner:false})
         else
-            return this.setState({showSpinner:false},()=>Actions.get())
+            return this.setState({showSpinner:false},()=>Actions.main())
     }
 
     login_social(type){

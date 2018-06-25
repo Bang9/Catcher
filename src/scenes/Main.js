@@ -25,7 +25,7 @@ import ko from 'moment/locale/ko';
 moment.locale('ko');
 
 const {width, height} = Dimensions.get('window');
-export default class Get extends Component {
+export default class Main extends Component {
     constructor() {
         super();
         this.state     = {
@@ -96,12 +96,12 @@ export default class Get extends Component {
             <View style={styles.container}>
                 {
                     <View style={{alignItems: 'center'}}>
-                        <View style={{marginVertical: 10}}>
+                        <View style={{marginVertical: 5,flexDirection:'row',alignItems:'center',justifyContent:'center'}}>
                             <Animated.Image
                                 resizeMode={Image.resizeMode.contain}
                                 style={{
                                     transform: [{rotate: spin}],
-                                    width: 60, height: 60,
+                                    width: 30, height: 30,
                                     alignSelf: 'center'
                                 }}
                                 source={require('../images/Catcher.png')}
@@ -176,8 +176,8 @@ const styles = StyleSheet.create({
     },
     historyContainer: {
         flexDirection: 'row',
-        marginVertical: 3,
-        paddingHorizontal: 10,
+        marginBottom: 6,
+        paddingVertical: 20,
         width: width,
         height: 50,
         justifyContent: 'center',

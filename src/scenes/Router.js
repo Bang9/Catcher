@@ -7,7 +7,7 @@ import {Actions, Reducer, Router, Scene, Drawer} from "react-native-router-flux"
 
 //scenes
 import Login from "./Login";
-import Get from "./Get";
+import Main from "./Main";
 import MenuDrawer from './MenuDrawer';
 import Guide from './Guide';
 
@@ -81,8 +81,8 @@ class App extends Component {
                     >
                         {/* Main */}
                         <Scene
-                            key="get"
-                            component={Get}
+                            key="main"
+                            component={Main}
                             title="Catcher"
                             initial={this.state.authState}
                             renderRightButton={()=>{
@@ -119,7 +119,7 @@ class App extends Component {
 
     onBackHandler() {
         console.log('BackHandler:this.sceneKey:' + Actions.currentScene);
-        if (Actions.currentScene === "_get" || Actions.currentScene === "_login") {
+        if (Actions.currentScene === "_main" || Actions.currentScene === "_login") {
             if(Date.now() > this.backPressedTime+2000) {
                 this.backPressedTime = Date.now()
                 ToastAndroid.show('뒤로 버튼을 한번 더 누르면 종료됩니다.', ToastAndroid.SHORT);
@@ -145,7 +145,7 @@ class App extends Component {
             //console.log("ACTION:", action);
             if (action.scene)
                 console.log("ACTION:", [action.scene.sceneKey, action.scene.type]);
-            if (action.scene && action.scene.sceneKey === 'get' &&
+            if (action.scene && action.scene.sceneKey === 'main' &&
                 (action.scene.type === 'REACT_NATIVE_ROUTER_FLUX_PUSH' || action.scene.type === 'REACT_NATIVE_ROUTER_FLUX_REFRESH')) {
                 console.log('catch back to main');
             }

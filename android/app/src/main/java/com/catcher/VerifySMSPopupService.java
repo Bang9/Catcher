@@ -7,8 +7,8 @@ import android.graphics.PixelFormat;
 import android.os.Handler;
 import android.os.IBinder;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -39,19 +39,18 @@ public class VerifySMSPopupService extends Service {
 
         // Get window width using window manager
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
-        Display display = windowManager.getDefaultDisplay();
-        int width = (int) (display.getWidth() * 0.9);
+        DisplayMetrics display = getApplicationContext().getResources().getDisplayMetrics();
+        int width = (int)(display.widthPixels*0.85);
+        int height = display.heightPixels;
 
         // Set window params
         params = new WindowManager.LayoutParams(
-                width,
-                WindowManager.LayoutParams.WRAP_CONTENT,
+                width,150,
                 WindowManager.LayoutParams.TYPE_PHONE,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT
         );
-        params.gravity = Gravity.CENTER | Gravity.BOTTOM;
-        params.y = 230;
+        params.gravity = Gravity.CENTER | Gravity.CENTER;
 
         // Get popup view and views component
         LayoutInflater layoutInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -71,21 +70,21 @@ public class VerifySMSPopupService extends Service {
         }
 
         //If popupView has already shown will be remove
-        if( popupView.isShown() ){
-            windowManager.removeViewImmediate(popupView);
+        if( popupView.getWindowToken() != null ){
+            removePopup();
         }
 
         // Add view
         windowManager.addView(popupView, params);
 
-        // Service will be finished after 6.5sec
+        // Service will be finished after 5sec
         Handler mHandler = new Handler();
         mHandler.postDelayed(new Runnable(){
             @Override
             public void run(){
                 removePopup();
             }
-        },6500);
+        },5000);
 
         // This service no need to restart, just one way service
         return START_NOT_STICKY;
@@ -98,9 +97,7 @@ public class VerifySMSPopupService extends Service {
             public boolean onTouch(View view, MotionEvent ev){
                 switch(ev.getAction()){
                     case MotionEvent.ACTION_DOWN:
-                        Log.d("TOAST","PRESS");
                         copyToClipboard(getApplicationContext(), auth_number);
-                        //Toast.makeText(VerifySMSPopupService.this, "눌림버튼", Toast.LENGTH_SHORT).show();
                         return true;
                 }
                 return false;
@@ -129,6 +126,7 @@ public class VerifySMSPopupService extends Service {
         Toast.makeText(context, "복사되었습니다.", Toast.LENGTH_SHORT).show();
     }
 
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -136,8 +134,13 @@ public class VerifySMSPopupService extends Service {
     }
 
     public void removePopup() {
-        if(popupView != null && windowManager != null)
-            windowManager.removeView(popupView);
+        if(popupView != null && windowManager != null){
+            try{
+                windowManager.removeView(popupView);
+            }catch(IllegalArgumentException e){
+                Log.e("error", "view not found");
+            }
+        }
     }
 
     @Override
