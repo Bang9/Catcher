@@ -3,20 +3,21 @@ import {ActivityIndicator, BackHandler, Image, Platform, StatusBar, StyleSheet,
     TouchableOpacity, AsyncStorage ,View, Text, AppState, ToastAndroid} from "react-native";
 
 //modules
-import {Actions, Reducer, Router, Scene, Drawer} from "react-native-router-flux";
+import {Actions, Reducer, Router, Scene, Lightbox} from "react-native-router-flux";
 import {auth} from "react-native-firebase";
 //scenes
-import Login from "./Login";
-import Main from "./Main";
-import MenuDrawer from './MenuDrawer';
-import Guide from './Guide';
+import Login from "../login/Login";
+import Main from "../main/Main";
+import MenuDrawer from '../main/MenuDrawer';
+import Guide from '../main/Guide';
 
 //services
-import API from "../services/API"
+import API from "../../services/API"
 
 //images
-import MenuIcon from '../images/menu.png';
-import Theme from "../commons/Theme";
+import MenuIcon from '../../images/menu.png';
+import Theme from "../../commons/Theme";
+import TermsModal from "../modal/TermsModal";
 
 //global states
 global.appState = AppState.currentState
@@ -66,28 +67,30 @@ class App extends Component {
                 titleStyle={styles.title}
                 backAndroidHandler={()=>this.onBackHandler()} >
 
-                <Scene key="root">
-                    <Scene
-                        key="drawer"
-                        drawer
-                        contentComponent={MenuDrawer}
-                        hideNavBar
-                        drawerPosition="right"
-                    >
-                        {/* Main */}
+                <Lightbox>
+                    <Scene key="root">
                         <Scene
-                            key="main"
-                            component={Main}
-                            title="Catcher"
-                            initial={authenticated}
-                            renderRightButton={()=>{
-                                return (
-                                    <TouchableOpacity onPress={()=>Actions.drawerOpen()}>
-                                        <Image style={{right:10,width:30,height:30,tintColor:'#fff'}} source={require('../images/menu.png')}/>
-                                    </TouchableOpacity>
-                                )}}
-                            renderLeftButton={()=>null}
-                        />
+                            key="drawer"
+                            drawer
+                            contentComponent={MenuDrawer}
+                            hideNavBar
+                            drawerPosition="right"
+                        >
+                            {/* Main */}
+                            <Scene
+                                key="main"
+                                component={Main}
+                                title="Catcher"
+                                initial={authenticated}
+                                renderRightButton={()=>{
+                                    return (
+                                        <TouchableOpacity onPress={()=>Actions.drawerOpen()}>
+                                            <Image style={{right:10,width:30,height:30,tintColor:'#fff'}} source={require('../../images/menu.png')}/>
+                                        </TouchableOpacity>
+                                    )}}
+                                renderLeftButton={()=>null}
+                            />
+                        </Scene>
 
                         {/* Sign */}
                         <Scene
@@ -97,24 +100,28 @@ class App extends Component {
                             sceneStyle ={{marginTop:0}}
                             initial={!authenticated}
                         />
+
+                        {/* Guide */}
+                        <Scene
+                            key="guide"
+                            component={Guide}
+                            hideNavBar={true}
+                            title="Catcher"
+                        />
                     </Scene>
 
-                    {/* Guide */}
                     <Scene
-                        key="guide"
-                        component={Guide}
-                        hideNavBar={true}
-                        title="Catcher"
+                        key={"termsModal"}
+                        component={TermsModal}
                     />
-                </Scene>
-
+                </Lightbox>
             </Router>
         )
     }
 
     onBackHandler() {
         console.log('BackHandler:this.sceneKey:' + Actions.currentScene);
-        if (Actions.currentScene === "main" || Actions.currentScene === "login") {
+        if (Actions.currentScene.match(/main|login/)) {
             if(Date.now() > this.backPressedTime+2000) {
                 this.backPressedTime = Date.now();
                 ToastAndroid.show('뒤로 버튼을 한번 더 누르면 종료됩니다.', ToastAndroid.SHORT);
@@ -136,9 +143,8 @@ class App extends Component {
 
 const styles = StyleSheet.create({
     navBar:{
-        backgroundColor : '#7318c6',
-        borderBottomColor:'#ffffff00',
-
+        backgroundColor : Theme.lightPurple,
+        borderBottomColor:Theme.transparent,
     },
     scene: {
         flex :1,
@@ -146,10 +152,12 @@ const styles = StyleSheet.create({
         backgroundColor:'#fff'
     },
     title: {
+        flex:1,
         fontSize: 17,
         fontWeight: "600",
         color:'white',
-        alignSelf:'center'
+        alignSelf:'center',
+        textAlign:"center"
     }
 });
 

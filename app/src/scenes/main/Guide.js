@@ -15,6 +15,7 @@ import {
 
 import Swiper from 'react-native-swiper';
 import {Actions} from 'react-native-router-flux';
+import Theme from "../../commons/Theme";
 
 const {width,height} = Dimensions.get('window')
 
@@ -54,15 +55,15 @@ export default class Get extends Component {
                         activeDotStyle={{width:7,height:7,backgroundColor:'#333'}}
                     >
                         <Slide
-                            source={require('../images/guide_1.png')}
+                            source={require('../../images/guide_1.png')}
                             text={"\n캐쳐는 여러분의 인증을\n더욱 쉽고 빠르게 도와줍니다."}
                         />
                         <Slide
-                            source={require('../images/guide_2.png')}
+                            source={require('../../images/guide_2.png')}
                             text={"\n메세지를 통해서\n인증번호가 도착하면"}
                         />
                         <Slide
-                            source={require('../images/guide_3.png')}
+                            source={require('../../images/guide_3.png')}
                             text={"스마트폰에서는 팝업 메시지로\n스마트폰이 멀리있어도\n웹으로 인증번호를 빠르고 쉽게 제공합니다"}
                             button={true}
                         />
@@ -79,7 +80,7 @@ export default class Get extends Component {
                     <Image
                         resizeMode={"contain"}
                         style={{width:40,height:40, alignSelf:'center'}}
-                        source={require('../images/Catcher.png')}
+                        source={require('../../images/Catcher.png')}
                     />
 
                     <Text style={{fontSize:20,alignSelf:'center',color:'#9a34b9',fontWeight:'800'}}>CATCHER</Text>
@@ -115,7 +116,7 @@ class Slide extends Component{
                     this.props.button &&
                     <TouchableOpacity
                         onPress={()=>Actions.pop()}
-                        style={{position:'absolute',bottom:60,width:250,height:50,backgroundColor:'#5baaff', alignItems:'center', justifyContent:'center'}}>
+                        style={{position:'absolute',bottom:60,width:250,height:50,backgroundColor:Theme.blue, alignItems:'center', justifyContent:'center'}}>
                         <Text style={{fontSize:15, color:'#fff', fontWeight:'700'}}>확 인</Text>
                     </TouchableOpacity>
                 }

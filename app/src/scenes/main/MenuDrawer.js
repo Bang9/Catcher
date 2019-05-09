@@ -1,11 +1,11 @@
 import React,{Component} from 'react';
-import { StyleSheet, Text, View, ViewPropTypes,Image, TouchableNativeFeedback, Dimensions, } from 'react-native';
+import { StyleSheet, Text, View, ViewPropTypes,Image, TouchableNativeFeedback, Dimensions,Alert, Linking } from 'react-native';
 
 import { Actions } from 'react-native-router-flux';
 import PropTypes from "prop-types";
 
-import API from '../services/API';
-import firebase from '../commons/Firebase'
+import API from '../../services/API';
+import firebase from "react-native-firebase";
 const {width,height} = Dimensions.get('window');
 
 
@@ -14,71 +14,38 @@ class MenuDrawer extends React.Component {
         name: PropTypes.string,
         sceneStyle: ViewPropTypes.style,
         title: PropTypes.string,
-    }
+    };
 
     static contextTypes = {
         drawer: PropTypes.object,
-    }
+    };
 
     constructor(){
         super();
-        this.state={
-            authType:null,
-            userConfig:{
-                photoURL:null,
-                name:null,
-                email:null,
-                uid:null,
-            }
-        }
-        this.initState=this.state;
     }
 
-    componentDidMount(){
-        console.log('drawer did mounted')
-        this.unsubscribe = firebase.auth().onAuthStateChanged( (user)=>{
-                console.log('auth changed',user)
-                if(user){
-                    let ref = `users/${user.uid}/`
-                    API.getDataOnce(ref + 'userConfig')
-                        .then(data => this.setState({userConfig: data.val()}))
-                    API.getDataOnce(ref + 'authType')
-                        .then(data => this.setState({authType: data.val()}))
-                }
-            })
-    }
-
-    componentWillUnmount(){
-        console.log('drawer did unmounted')
-        this.unsubscribe();
-    }
-
-    render() {
-        const profile_photo = {uri:this.state.userConfig.photoURL}
-        const logged_in = (
+    renderProfile = () => {
+        console.log(firebase.auth().currentUser)
+        return(
             <View style={styles.profileContainer}>
                 <Image
                     style={styles.profilePhoto}
-                    source={profile_photo}
+                    source={{uri:firebase.auth().currentUser ? firebase.auth().currentUser.providerData[0].photoURL : ""}}
                 />
                 <View style={styles.profileUserConfig}>
-                    <Text style={{fontSize:10}}>{"Login with "+this.state.authType}</Text>
-                    <Text style={{fontSize:15,color:'#555'}}>{this.state.userConfig.name}</Text>
+                    <Text style={{fontSize:15,color:'#555'}}>{firebase.auth().currentUser ? firebase.auth().currentUser.displayName : "로그인 해주세요"}</Text>
                 </View>
             </View>
         )
-        const logged_out = (
-            <View style={styles.profileContainer}>
-                <View style={styles.profileUserConfig}>
-                    <Text style={{fontSize:15,color:'#cb7cfc'}}>로그인 해주세요</Text>
-                </View>
-            </View>
-        )
-        const profile_view = this.state.authType!=null ? logged_in : logged_out
+    };
 
+    render() {
         return (
             <View style={styles.container}>
-                {profile_view}
+                {
+                    this.renderProfile()
+                }
+
                 <Spliter style={{marginTop:20}}/>
 
                 <TouchableNativeFeedback
@@ -87,26 +54,31 @@ class MenuDrawer extends React.Component {
                         <Text>How to use</Text>
                     </View>
                 </TouchableNativeFeedback>
+
                 <Spliter/>
 
                 <TouchableNativeFeedback
-                    onPress={()=>{null}}>
+                    onPress={()=>Linking.openURL("https://catch-7e353.firebaseapp.com/")}>
                     <View style={{width:width*.8,height:50,justifyContent:'center',alignItems:'center'}}>
-                        <Text>설정</Text>
+                        <Text>캐쳐 웹사이트</Text>
                     </View>
                 </TouchableNativeFeedback>
+
                 <Spliter/>
+
+                <TouchableNativeFeedback
+                    onPress={this.leave}>
+                    <View style={{width:width*.8,height:50,justifyContent:'center',alignItems:'center'}}>
+                        <Text>탈퇴하기</Text>
+                    </View>
+                </TouchableNativeFeedback>
+
+                <Spliter/>
+
                 {
-                    this.state.authType!=null &&
+                    firebase.auth().currentUser &&
                     <View>
-                        <TouchableNativeFeedback
-                            onPress={
-                                ()=>API.logout(this.state.authType, ()=>{
-                                    Actions.login()
-                                    this.setState({authType:null})
-                                })
-                            }
-                        >
+                        <TouchableNativeFeedback onPress={this.logout}>
                             <View style={{width:width*.8,height:50,justifyContent:'center',alignItems:'center'}}>
                                 <Text>로그아웃</Text>
                             </View>
@@ -116,6 +88,50 @@ class MenuDrawer extends React.Component {
                 }
             </View >
         );
+    }
+
+    leave = () => {
+        Alert.alert("알림","정말 탈퇴하시겠어요?\n모든 민감한 정보는 즉시 안전하게 삭제됩니다.",
+            [
+                {
+                    text: '취소',
+                    onPress: () => {},
+                    style: 'cancel',
+                },
+                {
+                    text: '탈퇴하기',
+                    onPress: ()=>API.leave((success)=>{
+                        if(success){
+                            Actions.login();
+                        }else{
+                            alert("탈퇴 실패")
+                        }
+                    })
+                },
+            ]
+        )
+    };
+
+    logout = () => {
+        Alert.alert("알림","로그아웃 하시겠어요?",
+            [
+                {
+                    text: '취소',
+                    onPress: () => {},
+                    style: 'cancel',
+                },
+                {
+                    text: '로그아웃',
+                    onPress: ()=>API.logout((success)=>{
+                        if(success){
+                            Actions.login();
+                        }else{
+                            alert("로그아웃 실패")
+                        }
+                    })
+                },
+            ]
+        )
     }
 }
 class Spliter extends Component{

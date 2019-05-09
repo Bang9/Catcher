@@ -15,13 +15,16 @@ import {
     Easing,
     StatusBar,
     ScrollView,
-    Dimensions
+    Dimensions,
+    TouchableOpacity,
+    PermissionsAndroid,
+    Alert
 } from 'react-native';
-import firebase from '../commons/Firebase';
-import API from '../services/API';
+import firebase from '../../commons/Firebase';
+import API from '../../services/API';
 import moment from 'moment';
 import ko from 'moment/locale/ko';
-import Theme from "../commons/Theme";
+import Theme from "../../commons/Theme";
 
 moment.locale('ko');
 
@@ -36,13 +39,41 @@ export default class Main extends Component {
     }
 
     componentDidMount() {
-        console.log('DID MOUNT');
+        PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.RECEIVE_SMS,
+            {
+                title: 'SMS 수신권한 요청',
+                message:
+                    '캐쳐는 인증번호를 수신하고 간편하게 보여주기 위해서' +
+                    '사용자의 SMS 수신 권한을 필요로 합니다.',
+                buttonNeutral: '',
+                buttonNegative: '취소',
+                buttonPositive: '확인',
+            })
         this.onHistory();
         this.spin();
     }
 
     componentWillUnmount() {
-        API.getDataOff()
+        this.offHistory();
+    }
+
+    onHistory() {
+        const uid = API.getUid();
+        const historyRef = `users/${uid}/verificationData`;
+
+        firebase.database().ref(historyRef).orderByChild('/time').limitToLast(20).on('value', (snapshot) => {
+            const result = snapshot.val();
+            if (result) {
+                this.setState({verifyList : Object.values(result)})
+            }
+        })
+    }
+
+    offHistory(){
+        const uid = API.getUid();
+        const historyRef = `users/${uid}/verificationData`;
+        API.getDataOff(historyRef);
     }
 
     spin() {
@@ -57,42 +88,14 @@ export default class Main extends Component {
         ).start(() => this.spin())
     }
 
-    onHistory() {
-        const uid        = API.getUid();
-        const historyRef = `users/${uid}/verificationData`;
-
-        firebase.database().ref(historyRef).orderByChild('/time').limitToLast(20).on('value', (snapshot) => {
-            const result = snapshot.val();
-            if (result) {
-                let verifyList = [];
-                const keys     = Object.keys(result);
-                keys.sort().reverse().some((key) => {
-                    result[key].time = moment(parseInt(result[key].time));
-                    verifyList.push(result[key])
-                });
-                this.setState({verifyList})
-            }
-        })
-        /*        API.getDataOn(historyRef, (snapshot)=>{
-         const result = snapshot.val();
-         if(result){
-         const keys = Object.keys(result);
-         let verifyList = [];
-         keys.some( (key)=>{ verifyList.push(result[key])} );
-         console.log(verifyList)
-         this.setState({verifyList})
-         }
-         })*/
-
-    }
-
     render() {
         const spin = this.spinValue.interpolate({
             inputRange: [0, 1],
             outputRange: ['0deg', '360deg']
-        })
+        });
 
         const {verifyList} = this.state;
+
         return (
             <View style={styles.container}>
                 {
@@ -105,28 +108,28 @@ export default class Main extends Component {
                                     width: 30, height: 30,
                                     alignSelf: 'center'
                                 }}
-                                source={require('../images/Catcher.png')}
+                                source={require('../../images/Catcher.png')}
                             />
                             <Text>인증 히스토리</Text>
                         </View>
                         <ScrollView style={{flex: 1}}>
                             {
-                                verifyList != null &&
                                 verifyList.map((item, i) => {
-                                    const {code, time} = item;
+                                    const {code,sms} = item;
+                                    const time = parseInt(item.time);
                                     return (
-                                        <View key={i} style={styles.historyContainer}>
+                                        <TouchableOpacity onPress={()=>this.popupSms(sms)} key={time} style={styles.historyContainer}>
                                             <View style={{alignItems: 'flex-start', position: 'absolute', left: 15}}>
                                                 <Text style={{
                                                     fontSize: 11,
                                                     lineHeight: 14,
                                                     color: '#9c9c9c'
-                                                }}>{time.format('YYYY/MM/DD')}</Text>
+                                                }}>{moment(time).format('YYYY/MM/DD')}</Text>
                                                 <Text style={{
                                                     fontSize: 14,
                                                     lineHeight: 14,
                                                     color: '#5e5e5e'
-                                                }}>{time.format('HH:mm')}</Text>
+                                                }}>{moment(time).format('HH:mm')}</Text>
                                             </View>
                                             <View style={{flex: 1, alignItems: 'center'}}>
                                                 <Text
@@ -138,9 +141,9 @@ export default class Main extends Component {
                                                 }}>{code}</Text>
                                             </View>
                                             <View style={{alignItems: 'flex-end', position: 'absolute', right: 15}}>
-                                                <Text style={{fontSize: 11, color: '#9c9c9c'}}>{time.fromNow()}</Text>
+                                                <Text style={{fontSize: 11, color: '#9c9c9c'}}>{moment(time).fromNow()}</Text>
                                             </View>
-                                        </View>
+                                        </TouchableOpacity>
                                     )
                                 })
                             }
@@ -155,6 +158,9 @@ export default class Main extends Component {
                 />
             </View>
         );
+    }
+    popupSms = (sms) => {
+        Alert.alert("인증문자",sms);
     }
 }
 

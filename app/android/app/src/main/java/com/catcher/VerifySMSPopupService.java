@@ -4,8 +4,11 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -17,6 +20,9 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import static android.support.v4.app.ActivityCompat.startActivityForResult;
+
 
 public class VerifySMSPopupService extends Service {
     //Constructor
@@ -44,12 +50,23 @@ public class VerifySMSPopupService extends Service {
         int height = display.heightPixels;
 
         // Set window params
-        params = new WindowManager.LayoutParams(
-                width,150,
-                WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT
-        );
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            params = new WindowManager.LayoutParams(
+                    width,150,
+                    WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                    PixelFormat.TRANSLUCENT
+            );
+        }else{
+            params = new WindowManager.LayoutParams(
+                    width,150,
+                    WindowManager.LayoutParams.TYPE_PHONE,
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                    PixelFormat.TRANSLUCENT
+            );
+        }
+
         params.gravity = Gravity.CENTER | Gravity.CENTER;
 
         // Get popup view and views component

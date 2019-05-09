@@ -4,20 +4,22 @@
 	"private": true,
 	"scripts": {
 		"start": "node node_modules/react-native/local-cli/cli.js start",
-		"test": "jest"
+		"test": "jest",
+		"postinstall": "node ./android-react-gradle-fix.js",
+		"bundle-android": "sudo sh android-bundle.sh",
+		"release-apk": "npm run bundle-android && cd android && ./gradlew assembleRelease && mkdir -p ../apk && cp app/build/outputs/apk/release/app-release.apk ../apk/app-release.apk"
 	},
 	"dependencies": {
 		"moment": "^2.24.0",
 		"prop-types": "^15.7.2",
 		"react": "^16.8.6",
 		"react-native": "^0.59.8",
-		"react-native-android-sms-listener": "^0.7.0",
 		"react-native-firebase": "^5.3.1",
 		"react-native-google-signin": "^2.0.0",
 		"react-native-loading-spinner-overlay": "^1.0.1",
+		"react-native-modal": "^10.0.0",
 		"react-native-router-flux": "^4.0.6",
-		"react-native-swiper": "^1.5.12",
-		"react-native-vector-icons": "^4.4.0"
+		"react-native-swiper": "^1.5.12"
 	},
 	"devDependencies": {
 		"@babel/core": "7.4.0",
