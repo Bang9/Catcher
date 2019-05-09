@@ -35,7 +35,7 @@
         android:layout_width="0.5dp"
         android:layout_height="35dp"
         android:layout_gravity="center_vertical|center_horizontal"
-        android:background="@color/cardview_dark_background"></View>
+        android:background="#aaa"></View>
 
     <Button
         android:id="@+id/btn_copy"
