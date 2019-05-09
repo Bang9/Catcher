@@ -21,6 +21,7 @@ import firebase from '../commons/Firebase';
 import API from '../services/API';
 import moment from 'moment';
 import ko from 'moment/locale/ko';
+import Theme from "../commons/Theme";
 
 moment.locale('ko');
 
@@ -98,7 +99,7 @@ export default class Main extends Component {
                     <View style={{alignItems: 'center'}}>
                         <View style={{marginVertical: 5,flexDirection:'row',alignItems:'center',justifyContent:'center'}}>
                             <Animated.Image
-                                resizeMode={Image.resizeMode.contain}
+                                resizeMode={"contain"}
                                 style={{
                                     transform: [{rotate: spin}],
                                     width: 30, height: 30,
@@ -149,7 +150,7 @@ export default class Main extends Component {
 
                 <StatusBar
                     animated={true}
-                    backgroundColor="#6217B1"
+                    backgroundColor={Theme.purple}
                     barStyle="light-content"
                 />
             </View>

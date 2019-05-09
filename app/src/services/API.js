@@ -1,46 +1,12 @@
 import { AsyncStorage ,Alert,ToastAndroid } from 'react-native'
 import firebase from '../commons/Firebase'
-import FBSDK from 'react-native-fbsdk';
 import {GoogleSignin} from 'react-native-google-signin';
 
 const GOOGLE_AUTH_CLIENT_ID = "216812482275-ipa1m8r6g1sjvo8tdvgh7uc0nvmfmslj.apps.googleusercontent.com";
-const {
-    AccessToken,
-    LoginManager,
-    GraphRequest,
-    GraphRequestManager,
-} = FBSDK;
 
 class API {
-    //************ Auth API
-    async getAuth(){
-        // authState string - facebook/kakao/email/null
-        // return obj - {result,authType}
-        try {
-            return await AsyncStorage.getItem('@Session:authType')
-                .then((authState)=>{
-                    if (authState != null)
-                        return {
-                            result: true,
-                            authType: authState
-                        }
-                    else
-                        return {
-                            result: false,
-                            authType: null,
-                        }
-                })
-        }
-        catch(err){
-            console.log("Get auth failed:",err)
-        }
-    }
-
     login(type,callback,data){
         switch(type){
-            case'facebook' :
-                return this._fbAuth_Login(callback);
-
             case'google' :
                 return this._gAuth_Login(callback);
 
@@ -51,10 +17,6 @@ class API {
 
     logout(type,callback){
         switch(type){
-            case'facebook' :
-                this._fbAuth_Logout();
-                break;
-
             case'google' :
                 this._gAuth_Logout();
                 break;
@@ -66,19 +28,9 @@ class API {
     }
 
     setUserData(currentUser,authType){
-        console.log('SET USER DATA START::',currentUser)
-        let userConfig = null;
+        console.log('SET USER DATA START::',currentUser);
+        let userConfig,result;
 
-        if(authType === 'facebook') {
-            console.log('SET USER DATA FACEBOOK')
-            result = currentUser.providerData[0]
-            userConfig = {
-                name: result.displayName || 'none',
-                email: result.email || 'none',
-                photoURL: result.photoURL || 'none',
-                uid: result.uid
-            };
-        }
         if(authType === 'google'){
             result = currentUser._user;
             userConfig = {
@@ -88,10 +40,8 @@ class API {
                 uid: result.uid
             };
         }
-        console.log('set user data result',userConfig)
 
-        AsyncStorage.setItem('@Session:authType', authType);
-        AsyncStorage.setItem('@Session:userConfig', JSON.stringify(userConfig));
+
         console.log("SET USER CONFIG");
         return firebase.database().ref(`users/${result.uid}`).update({
             authType: authType,
@@ -152,64 +102,8 @@ class API {
     _gAuth_Logout(callback){
         GoogleSignin.signOut();
         firebase.auth().signOut();
-        AsyncStorage.removeItem('@Session:authType')
-        AsyncStorage.removeItem('@Session:userConfig')
     }
 
-    _fbAuth_Login(callback){ // @callback param : isCancel(boolean)
-        LoginManager
-            .logInWithReadPermissions(['public_profile', 'email'])
-            .then((result) => {
-                if (result.isCancelled) {
-                    return callback(result.isCancelled)
-                    //return Promise.resolve('cancelled');
-                }
-                console.log(`Login success with permissions: ${result.grantedPermissions.toString()}`);
-                // get the access token
-                return AccessToken.getCurrentAccessToken();
-            })
-            .then(data => {
-                // create a new firebase credential with the token
-                const credential = firebase.auth.FacebookAuthProvider.credential(data.accessToken);
-                // login with credential
-                console.log("FBAUTH CREDENTIAL::",credential)
-                return firebase.auth().signInWithCredential(credential);
-            })
-            .then((currentUser) => {
-                if (currentUser === 'cancelled') {
-                    console.log('Login cancelled');
-                } else {
-                    console.log("FBAUTH SIGNED IN, Current User::",currentUser)
-                    // now signed in
-                    callback(false);
-                    return this.setUserData(currentUser,'facebook')
-                    //console.warn(JSON.stringify(currentUser.toJSON()));
-                }
-            })
-            .catch((error) => {
-                callback(true)
-                console.log(`Login fail with error: ${error}`);
-
-                if(error.code=='auth/user-disabled')
-                    return ToastAndroid.show('사용 불가능한 계정입니다', ToastAndroid.SHORT)
-
-                return Alert.alert('에러','관리자에게 문의하세요\n에러코드 : '+error.code+'\n'+error.message)
-            });
-
-    }
-
-    _fbAuth_Logout(){
-        LoginManager.logOut();
-        firebase.auth().signOut();
-        AsyncStorage.removeItem('@Session:authType')
-        AsyncStorage.removeItem('@Session:userConfig')
-    }
-    getUid(){
-        if(firebase.auth().currentUser)
-            return firebase.auth().currentUser.uid;
-        else
-            return null;
-    }
 
     //************ Database API
     async getDataOnce(ref){

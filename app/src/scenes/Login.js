@@ -5,6 +5,7 @@ import {Actions} from 'react-native-router-flux'
 import API from '../services/API'
 import Button from "../components/Button";
 import Icon from 'react-native-vector-icons/Ionicons'
+import Theme from "../commons/Theme";
 const {width,height} = Dimensions.get('window');
 
 class Login extends Component {
@@ -19,15 +20,6 @@ class Login extends Component {
 
         const loginView=(
             <View style={styles.loginContainer}>
-                <Button
-                    title="페이스북 로그인"
-                    icon = {<Icon name="logo-facebook" style={{fontSize:25,color:'#3B5998'}}/>}
-                    color={'#fff'}
-                    titleStyle={{color:'#3B5998'}}
-                    buttonStyle={{margin:10,width: width * .8,borderColor:'#3e80c2',borderWidth:0.5,borderRadius:0,height:50, elevation:1.5}}
-                    onClick={() =>{this.login_social('facebook')}}
-                />
-
                 <Button
                     title="구글 로그인"
                     icon = {<Image source={{uri:'https://developers.google.com/identity/images/g-logo.png'}} style={{width:20,height:20,}}/>}
@@ -45,13 +37,13 @@ class Login extends Component {
 
                 <StatusBar
                     animated={true}
-                    backgroundColor="#6217B1"
+                    backgroundColor={Theme.purple}
                     barStyle="light-content"
                 />
 
                 <View style={{marginTop:150}}>
                 <Image
-                    resizeMode={Image.resizeMode.contain}
+                    resizeMode={"contain"}
                     style={{width:120,height:120, alignSelf:'center'}}
                     source={require('../images/Catcher.png')}
                 />

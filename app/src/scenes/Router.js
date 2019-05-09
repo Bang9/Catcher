@@ -1,10 +1,10 @@
 import React, {Component} from "react";
-import {Alert, BackHandler, Image, Platform, StatusBar, StyleSheet,
+import {ActivityIndicator, BackHandler, Image, Platform, StatusBar, StyleSheet,
     TouchableOpacity, AsyncStorage ,View, Text, AppState, ToastAndroid} from "react-native";
 
 //modules
 import {Actions, Reducer, Router, Scene, Drawer} from "react-native-router-flux";
-
+import {auth} from "react-native-firebase";
 //scenes
 import Login from "./Login";
 import Main from "./Main";
@@ -16,62 +16,57 @@ import API from "../services/API"
 
 //images
 import MenuIcon from '../images/menu.png';
+import Theme from "../commons/Theme";
 
 //global states
 global.appState = AppState.currentState
 
 class App extends Component {
     constructor(props){
-        super(props)
+        super(props);
         this.state={
-            onLoading : true,
-            authState : false,
-        }
+            loading : true,
+            authenticated : false,
+        };
         this.backPressedTime=0
     }
 
     componentWillMount(){
 
-        API.getAuth()
-            .then( (data) => {
-                if(data.result){
-                    console.log("GET AUTH:",data)
-                    this.setState({authState:true, onLoading:false})
-                } else{
-                    console.log('NO AUTH:',data)
-                    this.setState({authState:false, onLoading:false})
-                }
-            })
     }
 
     componentDidMount(prevProps,prevState){
-        AppState.addEventListener('change', (state)=>this.handleAppStateChange(state));
+        auth().onAuthStateChanged((user)=>{
+            if(user){
+                this.setState({
+                    loading: false,
+                    authenticated: true
+                })
+            }else{
+                this.setState({
+                    loading: false,
+                    authenticated: false
+                })
+            }
+        })
     }
 
-    componentWillUnmount() {
-        AppState.removeEventListener('change', (state)=>this.handleAppStateChange(state));
-    }
 
-    handleAppStateChange(nextAppState){
-        if (global.appState.match(/inactive|background/) && nextAppState === 'active') {
-            console.log('App has come to the foreground!')
-        }
-        global.appState = nextAppState;
-    }
 
     render(){
-        if(this.state.onLoading){
-            return(<View/>)
+        const {loading, authenticated} = this.state;
+
+        if(loading){
+            return(<ActivityIndicator size={"large"} style={{flex:1}} color={Theme.purple}/>)
         }
+
         return(
             <Router
                 navigationBarStyle={styles.navBar}
                 titleStyle={styles.title}
-                createReducer={(params)=>this.reducerCreate(params)}
                 backAndroidHandler={()=>this.onBackHandler()} >
 
                 <Scene key="root">
-
                     <Scene
                         key="drawer"
                         drawer
@@ -84,7 +79,7 @@ class App extends Component {
                             key="main"
                             component={Main}
                             title="Catcher"
-                            initial={this.state.authState}
+                            initial={authenticated}
                             renderRightButton={()=>{
                                 return (
                                     <TouchableOpacity onPress={()=>Actions.drawerOpen()}>
@@ -100,7 +95,7 @@ class App extends Component {
                             component={Login}
                             hideNavBar={true}
                             sceneStyle ={{marginTop:0}}
-                            initial={!this.state.authState}
+                            initial={!authenticated}
                         />
                     </Scene>
 
@@ -119,9 +114,9 @@ class App extends Component {
 
     onBackHandler() {
         console.log('BackHandler:this.sceneKey:' + Actions.currentScene);
-        if (Actions.currentScene === "_main" || Actions.currentScene === "_login") {
+        if (Actions.currentScene === "main" || Actions.currentScene === "login") {
             if(Date.now() > this.backPressedTime+2000) {
-                this.backPressedTime = Date.now()
+                this.backPressedTime = Date.now();
                 ToastAndroid.show('뒤로 버튼을 한번 더 누르면 종료됩니다.', ToastAndroid.SHORT);
                 return true; //remain in app
             }else{
@@ -135,22 +130,6 @@ class App extends Component {
                 console.log('onBackHandler:pop failed -maybe at root?');
                 return false;
             }
-        }
-    }
-
-    reducerCreate(params){
-        const defaultReducer = Reducer(params);
-        console.log("PARAM:",params);
-        return (state, action) => {
-            //console.log("ACTION:", action);
-            if (action.scene)
-                console.log("ACTION:", [action.scene.sceneKey, action.scene.type]);
-            if (action.scene && action.scene.sceneKey === 'main' &&
-                (action.scene.type === 'REACT_NATIVE_ROUTER_FLUX_PUSH' || action.scene.type === 'REACT_NATIVE_ROUTER_FLUX_REFRESH')) {
-                console.log('catch back to main');
-            }
-            this.sceneKey = action.scene ? action.scene.sceneKey : '';
-            return defaultReducer(state, action);
         }
     }
 }

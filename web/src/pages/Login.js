@@ -3,7 +3,6 @@ import {Redirect} from 'react-router-dom'
 
 import catcherLogo from '../images/catcher-logo.png';
 import googleLogo from '../images/google-logo.png';
-import facebookLogo from '../images/facebook-logo.png';
 
 import '../stylesheets/Login.css';
 import firebase from '../config/firebase';
@@ -14,12 +13,14 @@ class Login extends Component {
         this.state={
             isAuthenticated:false,
             height:0
-        }
+        };
         this.auth = firebase.auth();
     }
+
     componentDidMount(){
         this.authListener();
     }
+
     componentWillUnmount(){
         this.authListener();
     }
@@ -48,23 +49,12 @@ class Login extends Component {
                     location.pathname === "/" ?
                         <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:window.innerHeight*.7}}>
                             <img alt="logo" src={catcherLogo} style={{height: 100, width: 100, margin: 30}}/>
-                            < div className="login-form">
+                            <div className="login-form">
                                 <button className="google-login" onClick={(ev) => this._loginByGoogle(ev)}>
                                     <div className="google-login-logo">
                                         <img alt={'google-logo'} src={googleLogo} height="20" width="20"/>
                                     </div>
                                     <div className="google-login-title">구글 로그인</div>
-                                </button>
-
-                                <button className="facebook-login" onClick={(ev) => {
-                                    alert('준비중입니다.')
-                                    //this._loginByGoogle(ev)
-                                }
-                                }>
-                                    <div className="facebook-login-logo">
-                                        <img alt={'facebook-logo'} src={facebookLogo} height="20" width="20"/>
-                                    </div>
-                                    <div className="facebook-login-title">페이스북 로그인</div>
                                 </button>
                             </div>
                         </div>

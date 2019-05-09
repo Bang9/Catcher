@@ -77,7 +77,7 @@ export default class Get extends Component {
                     }}
                 >
                     <Image
-                        resizeMode={Image.resizeMode.contain}
+                        resizeMode={"contain"}
                         style={{width:40,height:40, alignSelf:'center'}}
                         source={require('../images/Catcher.png')}
                     />
@@ -99,7 +99,7 @@ class Slide extends Component{
             <View style={styles.slide}>
                 <View style={{flex:0.6, justifyContent:'flex-end'}}>
                     <Image
-                        resizeMode={Image.resizeMode.contain}
+                        resizeMode={"contain"}
                         style={{width:200,height:200, alignSelf:'center', tintColor:'#3aa0ff'}}
                         source={this.props.source}
                     />
