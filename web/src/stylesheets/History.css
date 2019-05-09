@@ -1,0 +1,92 @@
+.history-app-logo {
+    animation: spin 4s infinite linear;
+    width:25px;
+    height:25px;
+}
+.history-app-logo-wrapper {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    width:100%;
+    padding-top:10px;
+    padding-bottom:10px;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.user-profile {
+    flex-direction:row;
+    display:flex;
+    position:fixed;
+    padding-left:10px;
+    top:0;left:0;
+    color:white;
+    height:60px;
+    display:flex;
+    align-items:center;
+    z-index:2;
+}
+
+.user-profile-img {
+    height:45px;
+    width:45px;
+    margin-right:10px;
+    border-radius:50%;
+}
+
+.user-config {
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+}
+@media only screen and (max-width: 601px){
+    .user-config{visibility: hidden}
+}
+
+.logout-button {
+    display:flex;
+    align-items:center;
+    padding-right:10px;
+    color:white;
+    position:fixed;
+    top: 0;
+    right:0;
+    height:60px;
+    cursor:pointer;
+    z-index:2;
+}
+
+.history-item {
+    display:flex;
+    flex-direction:row;
+    width:80%;
+    height:50px;
+    justify-content: center;
+    background-color:#f7f7f7;
+    margin-bottom:10px;
+}
+.history-date {
+    display:flex;
+    flex: 1;
+    align-items: flex-start;
+    flex-direction:column;
+    margin-left:15px;
+    justify-content:center;
+}
+.history-code {
+    display:flex;
+    flex: 1;
+    align-items: center;
+    flex-direction:column;
+    justify-content:center;
+}
+.history-ago {
+    display:flex;
+    flex: 1;
+    justify-content:flex-end;
+    align-items:center;
+    margin-right:15px;
+}

@@ -1,0 +1,75 @@
+.login-form {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+}
+.google-login {
+    display:flex;
+    background-color:#fff;
+    width:250px;
+    height:50px;
+    justify-content:center;
+    align-items:center;
+    border:1px solid #ccc;
+    box-shadow:0 1px 1px 0 #c8c8c8;
+    margin:8px;
+}
+.google-login:hover {
+    background-color:#fafafa;
+}
+.google-login:focus {
+    background-color:#e8e8e8;
+}
+.google-login-logo {
+    display:flex;
+    flex:0.3;
+    width:50px;
+    height:30px;
+    justify-content: center;
+    align-items: center;
+    border-right: 1px solid #c8c8c8;
+    padding-right:5px;
+}
+.google-login-title {
+    display:flex;
+    flex:1;
+    justify-content:center;
+    font-size:13px;
+    color:#444
+}
+
+.facebook-login {
+    display:flex;
+    background-color:#fff;
+    width:250px;
+    height:50px;
+    justify-content:center;
+    align-items:center;
+    border:1px solid #3e80c2;
+    box-shadow:0 1px 1px 0 #c8c8c8;
+    margin:8px;
+}
+.facebook-login:hover {
+    background-color: #e8f6ff;
+}
+.facebook-login:focus {
+    background-color: #c1dfff;
+}
+.facebook-login-logo {
+    display:flex;
+    flex:0.3;
+    width:50px;
+    height:30px;
+    justify-content: center;
+    align-items: center;
+    border-right: 1px solid #3B5998;
+    padding-right:5px;
+}
+.facebook-login-title {
+    display:flex;
+    flex:1;
+    justify-content:center;
+    font-size:13px;
+    color:#3B5998
+}
