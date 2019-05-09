@@ -6,7 +6,9 @@ import {
     TextInput,
     TouchableNativeFeedback,
     Alert,
-} from 'react-native';
+} from 'react-native'
+
+import PropTypes from "prop-types";
 
 class Button extends Component{
 
@@ -25,10 +27,10 @@ class Button extends Component{
     }
 
     static propTypes = {
-        title : React.PropTypes.string,
-        color : React.PropTypes.string,
-        onClick : React.PropTypes.func,
-        icon : React.PropTypes.object,
+        title : PropTypes.string,
+        color : PropTypes.string,
+        onClick : PropTypes.func,
+        icon : PropTypes.object,
     };
 
     render(){

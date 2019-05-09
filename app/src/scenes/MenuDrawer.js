@@ -2,6 +2,8 @@ import React,{Component} from 'react';
 import { StyleSheet, Text, View, ViewPropTypes,Image, TouchableNativeFeedback, Dimensions, } from 'react-native';
 
 import { Actions } from 'react-native-router-flux';
+import PropTypes from "prop-types";
+
 import API from '../services/API';
 import firebase from '../commons/Firebase'
 const {width,height} = Dimensions.get('window');
@@ -9,13 +11,13 @@ const {width,height} = Dimensions.get('window');
 
 class MenuDrawer extends React.Component {
     static propTypes = {
-        name: React.PropTypes.string,
+        name: PropTypes.string,
         sceneStyle: ViewPropTypes.style,
-        title: React.PropTypes.string,
+        title: PropTypes.string,
     }
 
     static contextTypes = {
-        drawer: React.PropTypes.object,
+        drawer: PropTypes.object,
     }
 
     constructor(){
