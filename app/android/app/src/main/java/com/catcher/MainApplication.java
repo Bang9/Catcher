@@ -42,7 +42,7 @@ public class MainApplication extends Application implements ReactApplication {
               new RNFirebaseRemoteConfigPackage(),
               new RNFirebaseDatabasePackage(),
               new RNFirebaseMessagingPackage(),
-              new RNFirebasePerformancePackage(),
+              new RNFirebasePerformancePackage()
       );
     }
   };
