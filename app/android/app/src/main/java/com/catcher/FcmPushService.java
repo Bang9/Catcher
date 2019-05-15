@@ -87,7 +87,7 @@ public class FcmPushService{
             notification.put("title", "인증번호 " + this.authNumber);
             notification.put("body", "캐쳐에서 인증번호가 도착했어요!");
             notification.put("icon", "catcher-logo.png");
-            notification.put("click_action", "https://www.catcher.cf");
+            notification.put("click_action", "https://catch-7e353.firebaseapp.com/");
 
             body.put("notification", notification);
             body.put("to", pushToken);

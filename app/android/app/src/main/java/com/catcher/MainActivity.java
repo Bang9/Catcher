@@ -13,7 +13,6 @@ public class MainActivity extends ReactActivity {
 
     public static final int OVERLAY_PERMISSION_REQ_CODE = 1235;
 
-
     /**
      * Returns the name of the main component registered from JavaScript.
      * This is used to schedule rendering of the component.
@@ -27,6 +26,7 @@ public class MainActivity extends ReactActivity {
     public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Checking permissions on init
+        checkPerms();
     }
 
     public void checkPerms() {
