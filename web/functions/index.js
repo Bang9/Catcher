@@ -38,7 +38,7 @@ function pushStart(token,verifyList){
     console.log('VERFIY LIST',verifyList);
     const keys = Object.keys(verifyList);
     const recent = verifyList[keys.sort()[keys.length-1]];
-    const key = 'AAAAMnsH7uM:APA91bFhvxqJ--GGzc1-7CxgSVvMWvqRiUD5UzwGelDUuonxyk1loDY9BeC_yJzMYDMPurwmXuZDz243ldywZ_o1bVHEBo-NeHOQkxhXKrQYe5rUHMVYAG_pxy6A_huOV6Q_nZoMlRGA';
+    const key = '';
     const to = `${token}`;
     const notification = {
         'title': `인증번호 ${recent.code}`,
