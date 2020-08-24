@@ -1,4 +1,5 @@
 # Catcher
+The production service has been terminated.
 
 (Android Only)
 ### Receive Authenticate SMS via Web and App
